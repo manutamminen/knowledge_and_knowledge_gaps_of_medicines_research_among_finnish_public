@@ -85,10 +85,7 @@
 library(tidyverse)
 library(ggh4x)
 library(readxl)
-library(nnet)
 library(broom)
-library(ltm)
-library(reshape2)
 library(janitor)
 
 all_data <-
@@ -159,11 +156,6 @@ prep_logistic_regression <- function(dep, data = binary_responses)
         mutate(Dep_variable=dep)
 }
 
-glm(Q002_1_slice ~ T_gender + Q013 + T_Q001_2cat,
-    family = binomial(link = 'logit'), 
-    data = binary_responses) %>% 
-    summary
-
 binary_responses <- 
     all_data %>% 
     dplyr::select(contains("slice"), Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
@@ -178,20 +170,12 @@ logistic_test_results <-
     names %>% 
     map_df( ~ prep_logistic_regression(., data = binary_responses))
 
-
-glm(Q003_2_slice ~ Q013 + T_gender + T_Q001_2cat + Q002_1_slice,
-    family = binomial(link = 'logit'),
-    data = binary_responses) %>% 
-    tidy
-
-
 logistic_test_results %>%
     filter(p.value < 0.05) %>% 
     pivot_wider(id_cols = "Dep_variable",
                 names_from = "term",
                 values_from = "p.value") %>% 
     data.frame
-
 
 ############################
 ## Prepare numeric tables ##
@@ -261,7 +245,6 @@ long_binary_data %>%
     mutate(across(is.numeric, ~ . / 2)) %>% 
     data.frame
 
-
 long_binary_data %>% 
     filter(Question1 == "TT11edu1",
            Answer3 != -1) %>% 
@@ -273,7 +256,6 @@ long_binary_data %>%
                 values_from = n) %>% 
     mutate(across(is.numeric, ~ . / 2)) %>% 
     data.frame
-
 
 #########################
 ## Prepare the figures ##
@@ -308,35 +290,7 @@ long_data <-
         Question_type = ifelse(str_detect(Question3, "Q002"), "Pre", "Post"),
         Answer1=as.factor(Answer1),
         Answer2=as.factor(Answer2), 
-        Answer3=as.factor(Answer3), 
-        Question1 = case_when(
-            Question1 == "TT11edu1" ~ "Koulutus", 
-            Question1 == "Q013" ~ "Mihin seuraavista ikäryhmistä kuulut?") , 
-        Question2 = case_when(
-            Question2 == "T_Q001_2cat" ~ "Oletko koskaan aiemmin ollut tai oletko parhaillaan osallisena lääketieteellisessä tutkimuksessa?", 
-            Question2 == "T_gender" ~ "Sukupuoli", 
-            ),
-        Question3 = case_when(
-            Question3 == "Q002_1_slice" ~ "Lääkekehitys", 
-            Question3 == "Q002_2_slice" ~ "Lääketurvallisuus", 
-            Question3 == "Q002_3_slice" ~ "Potilaiden rooli ja \nvelvollisuudet lääkkeiden kehityksessä", 
-            Question3 == "Q002_4_slice" ~ "Yksilöllistetty hoito", 
-            Question3 == "Q002_5_slice" ~ "Ennakoiva terveydenhoito", 
-            Question3 == "Q002_6_slice" ~ "Kliinisten lääketutkimusten \nsuunnittelu ja tavoitteet", 
-            Question3 == "Q002_7_slice" ~ "Terveydenhuollon menetelmien arviointi", 
-            Question3 == "Q002_8_slice" ~ "Lääkehoitojen kustannusvaikuttavuus", 
-            Question3 == "Q002_9_slice" ~ "Uusien lääkkeiden kansallinen säätely",
-            Question3 == "Q003_1_slice" ~ "Lääkekehitys", 
-            Question3 == "Q003_2_slice" ~ "Lääketurvallisuus", 
-            Question3 == "Q003_3_slice" ~ "Potilaiden rooli ja \nvelvollisuudet lääkkeiden kehityksessä", 
-            Question3 == "Q003_4_slice" ~ "Yksilöllistetty hoito", 
-            Question3 == "Q003_5_slice" ~ "Ennakoiva terveydenhoito", 
-            Question3 == "Q003_6_slice" ~ "Kliinisten lääketutkimusten \nsuunnittelu ja tavoitteet", 
-            Question3 == "Q003_7_slice" ~ "Terveydenhuollon menetelmien arviointi", 
-            Question3 == "Q003_8_slice" ~ "Lääkehoitojen kustannusvaikuttavuus", 
-            Question3 == "Q003_9_slice" ~ "Uusien lääkkeiden kansallinen säätely"))
-
-
+        Answer3=as.factor(Answer3))
 
 pdf("age_education2.pdf")
 long_data %>% 
@@ -351,7 +305,6 @@ long_data %>%
           strip.text.x = element_text(size = 4))
 dev.off()
 
-
 pdf("gender_participation2.pdf")
 long_data %>% 
     filter(complete.cases(.)) %>% 
@@ -365,7 +318,6 @@ long_data %>%
           strip.text.x = element_text(size = 4))
 dev.off()
 
-
 pdf("all_data.pdf")
 long_data %>% 
     filter(complete.cases(.)) %>% 
@@ -377,7 +329,5 @@ long_data %>%
     theme(strip.text.y = element_text(angle = 0, size = 4),
           strip.text.x = element_text(size = 4))
 dev.off()
-
-
 
 #+END_SRC
