@@ -328,3 +328,38 @@ long_data %>%
 dev.off()
 
 #+END_SRC
+
+** Session info 
+
+R version 3.6.0 (2019-04-26)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS  10.15.4
+
+Matrix products: default
+BLAS/LAPACK: /Users/mavatam/miniconda3/lib/R/lib/libRblas.dylib
+
+locale:
+[1] C
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] janitor_2.0.1   broom_0.5.5     readxl_1.3.1    ggh4x_0.1.1    
+ [5] forcats_0.5.0   stringr_1.4.0   dplyr_0.8.5     purrr_0.3.3    
+ [9] readr_1.3.1     tidyr_1.0.2     tibble_3.0.0    ggplot2_3.3.0  
+[13] tidyverse_1.3.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.1       cellranger_1.1.0 pillar_1.4.3     compiler_3.6.0  
+ [5] dbplyr_1.4.2     tools_3.6.0      lubridate_1.7.4  jsonlite_1.6.1  
+ [9] lifecycle_0.2.0  nlme_3.1-141     gtable_0.3.0     lattice_0.20-41 
+[13] pkgconfig_2.0.3  rlang_0.4.5      reprex_0.3.0     rstudioapi_0.11 
+[17] cli_2.0.2        DBI_1.1.0        haven_2.2.0      withr_2.1.2     
+[21] xml2_1.3.1       httr_1.4.1       fs_1.2.7         generics_0.0.2  
+[25] vctrs_0.2.4      hms_0.5.3        grid_3.6.0       tidyselect_1.0.0
+[29] snakecase_0.11.0 glue_1.4.0       R6_2.4.1         fansi_0.4.1     
+[33] modelr_0.1.6     magrittr_1.5     backports_1.1.6  scales_1.0.0    
+[37] ellipsis_0.3.0   rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1
+[41] stringi_1.4.3    munsell_0.5.0    crayon_1.3.4    
+> 
