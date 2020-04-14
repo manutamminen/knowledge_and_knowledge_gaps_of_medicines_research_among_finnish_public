@@ -362,4 +362,3 @@ loaded via a namespace (and not attached):
 [33] modelr_0.1.6     magrittr_1.5     backports_1.1.6  scales_1.0.0    
 [37] ellipsis_0.3.0   rvest_0.3.5      assertthat_0.2.1 colorspace_1.4-1
 [41] stringi_1.4.3    munsell_0.5.0    crayon_1.3.4    
-> 
