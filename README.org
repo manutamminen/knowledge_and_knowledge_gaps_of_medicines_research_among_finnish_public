@@ -1,7 +1,7 @@
 
 * Self-perceived knowledge and knowledge gaps of medicines research and development and HTA-processes among Finnish general public 
 
-** Data - Knowledge about medicines research and development: 
+** Data - Knowledge about medicines research and development 
 
 *** Background variables
 
@@ -10,11 +10,15 @@
 | T_gender    | Gender                                                          |
 | T_Q001_2cat | Are you taking part or have you taken part in medical research? |
 
+*** Age responses
+
 | Q013 | 1 | 16-24 years |
 | Q013 | 2 | 25-34 years |
 | Q013 | 3 | 35-44 years |
 | Q013 | 4 | 45-54 years |
 | Q013 | 5 | 55-64 years |
+
+*** Education responses
 
 | TT11edu1 | 1 | Vocational education and training                |
 | TT11edu1 | 2 | High school degree                               |
@@ -22,12 +26,15 @@
 | TT11edu1 | 4 | Bachelor's degree, University of Applied Science |
 | TT11edu1 | 5 | University degree                                |
 
+*** Gender responses
+
 | T_gender | 1 | Female |
 | T_gender | 2 | Male   |
 
+*** Medical research responses
+
 | T_Q001_2cat | 1 | Yes |
 | T_Q001_2cat | 2 | No  |
-
 
 *** Current knowledge
 
@@ -41,9 +48,13 @@
 | Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
 | Q003_9_slice | Regulation                            |
 
-| 1 | No or poor knowledge        |
-| 2 | Good or very good knowledge |
+*** Knowledge responeses
 
+| 1 | No knowledge        |
+| 2 | Poor knowledge      |
+| 3 | Average knowledge   |
+| 4 | Good knowledge      |
+| 5 | Very good knowledge |
 
 *** Interest in learning more
 
@@ -57,8 +68,14 @@
 | Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
 | Q003_9_slice | Regulation                            |
 
-| 1 | No or poor knowledge        |
-| 2 | Good or very good knowledge |
+*** Interest responeses
+
+| 1 | No interest       |
+| 2 | Marginal interest |
+| 3 | Some interest     |
+| 4 | Interest          |
+| 5 | Much interest     |
+
 
 ** Analyses
 
@@ -126,81 +143,6 @@ q00p_responses %>%
     as.matrix %>% 
     chisq.test
 
-
-# Counts for the table
-
-q00p_responses %>%
-    tabyl(Q013, Q00P) %>% 
-    mutate(rsums = rowSums(.[-1]),
-           perc = `1` / rsums * 100) %>% 
-    as_tibble %>% 
-    dplyr::select(1, 3, 5) %>% 
-    rename(Counts = 2)
-
-
-q00p_responses %>%
-    tabyl(TT11edu1, Q00P) %>% 
-    mutate(rsums = rowSums(.[-1]),
-           perc = `1` / rsums * 100) %>% 
-    as_tibble %>% 
-    filter(!is.na(TT11edu1)) %>% 
-    dplyr::select(1, 3, 5) %>% 
-    rename(Counts = 2)
-
-
-q00p_resps <- function(...) {
-    q00p_responses %>%
-        tabyl(..., Q00P) %>% 
-        mutate(good_perc = `1` / 389 * 100)
-}
-
-q00p_resps(T_gender)
-q00p_resps(T_Q001_2cat)
-q00p_resps(Q013)
-q00p_resps(TT11edu1)
-
-binary_responses <- 
-    all_data %>% 
-    dplyr::select(contains("slice"), Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
-    mutate(across(contains("slice"),
-                  ~ case_when(. %in% 1:3 ~ 0,
-                              . %in% 4:5 ~ 1,
-                              TRUE ~ -1)))
-
-######################################
-## Cochran-Mantel-Haenszel χ2 tests ##
-######################################
-
-mant_test <- function(measure, data = all_data) {
-    mset <- dplyr::select(data, c("T_gender", "Q013", measure))
-    names(mset) <- c("gender", "age", "measure")
-    out_df <-
-        with(mset, table(gender, age, measure)) %>% 
-        mantelhaen.test %>% 
-        tidy
-    out_df$measure <- measure
-    out_df
-}
-
-all_data %>% 
-    dplyr::select(contains("slice")) %>% 
-    names %>% 
-    map_df(mant_test) %>% 
-    dplyr::select(measure, parameter, statistic, p.value)
-
-
-#####################
-## Cronbach alphas ##
-#####################
-
-map(c("Q002", "Q003"),
-    ~ dplyr::select(all_data,
-                    contains(.) & contains("slice")) %>% 
-    filter(complete.cases(.)) %>% 
-    mutate(across(everything(), as.numeric)) %>% 
-    cronbach.alpha(CI = TRUE, B = 1000))
-
-
 ##################################
 ## Logistic regression analyses ##
 ##################################
@@ -251,9 +193,9 @@ logistic_test_results %>%
     data.frame
 
 
-###############################
-## Prepare numeric tables... ##
-###############################
+############################
+## Prepare numeric tables ##
+############################
 
 long_binary_data <- 
     all_data %>% 
