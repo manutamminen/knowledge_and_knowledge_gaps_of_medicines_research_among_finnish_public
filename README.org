@@ -1,0 +1,441 @@
+
+* Self-perceived knowledge and knowledge gaps of medicines research and development and HTA-processes among Finnish general public 
+
+** Data - Knowledge about medicines research and development: 
+
+*** Background variables
+
+| Q013        | Age group                                                       |
+| TT11edu1    | Education                                                       |
+| T_gender    | Gender                                                          |
+| T_Q001_2cat | Are you taking part or have you taken part in medical research? |
+
+| Q013 | 1 | 16-24 years |
+| Q013 | 2 | 25-34 years |
+| Q013 | 3 | 35-44 years |
+| Q013 | 4 | 45-54 years |
+| Q013 | 5 | 55-64 years |
+
+| TT11edu1 | 1 | Vocational education and training                |
+| TT11edu1 | 2 | High school degree                               |
+| TT11edu1 | 3 | Post-secondary education                         |
+| TT11edu1 | 4 | Bachelor's degree, University of Applied Science |
+| TT11edu1 | 5 | University degree                                |
+
+| T_gender | 1 | Female |
+| T_gender | 2 | Male   |
+
+| T_Q001_2cat | 1 | Yes |
+| T_Q001_2cat | 2 | No  |
+
+
+*** Current knowledge
+
+| Q003_1_slice | Medicines development, drug discovery |
+| Q003_2_slice | Medicines safety                      |
+| Q003_3_slice | Patients role and responsibilities    |
+| Q003_4_slice | Personalized medicine                 |
+| Q003_5_slice | Predictive medicine                   |
+| Q003_6_slice | Clinical trials                       |
+| Q003_7_slice | HTA                                   |
+| Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
+| Q003_9_slice | Regulation                            |
+
+| 1 | No or poor knowledge        |
+| 2 | Good or very good knowledge |
+
+
+*** Interest in learning more
+
+| Q003_1_slice | Medicines development, drug discovery |
+| Q003_2_slice | Medicines safety                      |
+| Q003_3_slice | Patients role and responsibilities    |
+| Q003_4_slice | Personalized medicine                 |
+| Q003_5_slice | Predictive medicine                   |
+| Q003_6_slice | Clinical trials                       |
+| Q003_7_slice | HTA                                   |
+| Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
+| Q003_9_slice | Regulation                            |
+
+| 1 | No or poor knowledge        |
+| 2 | Good or very good knowledge |
+
+** Analyses
+
+
+#+BEGIN_SRC R :session
+
+library(tidyverse)
+library(ggh4x)
+library(readxl)
+library(nnet)
+library(broom)
+library(ltm)
+library(reshape2)
+library(janitor)
+
+all_data <-
+    read_csv("questionnaire.csv")
+
+######################
+## Chi square tests ##
+######################
+
+q00p_responses <- 
+    all_data %>% 
+    dplyr::select(Q00P, Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
+    mutate(Q00P = case_when(
+               Q00P %in% 1:3 ~ 0,
+               Q00P %in% 4:5 ~ 1,
+               TRUE ~ -1)) %>% 
+    filter(Q00P != -1)
+
+# Experience in medical research
+q00p_responses %>%
+    tabyl(T_Q001_2cat, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    dplyr::select(2:3) %>% 
+    as.matrix %>% 
+    chisq.test
+
+# Gender
+q00p_responses %>%
+    tabyl(T_gender, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    dplyr::select(2:3) %>% 
+    as.matrix %>% 
+    chisq.test
+
+# Age
+ q00p_responses %>%
+    tabyl(Q013, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    dplyr::select(2:3) %>% 
+    as.matrix %>% 
+    chisq.test
+
+# Education
+ q00p_responses %>%
+    tabyl(TT11edu1, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    dplyr::select(2:3) %>% 
+    as.matrix %>% 
+    chisq.test
+
+
+# Counts for the table
+
+q00p_responses %>%
+    tabyl(Q013, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    as_tibble %>% 
+    dplyr::select(1, 3, 5) %>% 
+    rename(Counts = 2)
+
+
+q00p_responses %>%
+    tabyl(TT11edu1, Q00P) %>% 
+    mutate(rsums = rowSums(.[-1]),
+           perc = `1` / rsums * 100) %>% 
+    as_tibble %>% 
+    filter(!is.na(TT11edu1)) %>% 
+    dplyr::select(1, 3, 5) %>% 
+    rename(Counts = 2)
+
+
+q00p_resps <- function(...) {
+    q00p_responses %>%
+        tabyl(..., Q00P) %>% 
+        mutate(good_perc = `1` / 389 * 100)
+}
+
+q00p_resps(T_gender)
+q00p_resps(T_Q001_2cat)
+q00p_resps(Q013)
+q00p_resps(TT11edu1)
+
+binary_responses <- 
+    all_data %>% 
+    dplyr::select(contains("slice"), Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
+    mutate(across(contains("slice"),
+                  ~ case_when(. %in% 1:3 ~ 0,
+                              . %in% 4:5 ~ 1,
+                              TRUE ~ -1)))
+
+######################################
+## Cochran-Mantel-Haenszel χ2 tests ##
+######################################
+
+mant_test <- function(measure, data = all_data) {
+    mset <- dplyr::select(data, c("T_gender", "Q013", measure))
+    names(mset) <- c("gender", "age", "measure")
+    out_df <-
+        with(mset, table(gender, age, measure)) %>% 
+        mantelhaen.test %>% 
+        tidy
+    out_df$measure <- measure
+    out_df
+}
+
+all_data %>% 
+    dplyr::select(contains("slice")) %>% 
+    names %>% 
+    map_df(mant_test) %>% 
+    dplyr::select(measure, parameter, statistic, p.value)
+
+
+#####################
+## Cronbach alphas ##
+#####################
+
+map(c("Q002", "Q003"),
+    ~ dplyr::select(all_data,
+                    contains(.) & contains("slice")) %>% 
+    filter(complete.cases(.)) %>% 
+    mutate(across(everything(), as.numeric)) %>% 
+    cronbach.alpha(CI = TRUE, B = 1000))
+
+
+##################################
+## Logistic regression analyses ##
+##################################
+
+prep_logistic_regression <- function(dep, data = binary_responses)
+{
+    model <-
+        paste(dep, "~ T_gender + Q013 + TT11edu1 + T_Q001_2cat") %>%
+        as.formula
+    glm(formula = model,
+        family = binomial(link = 'logit'), 
+        data = data) %>%
+        tidy %>%
+        mutate(Dep_variable=dep)
+}
+
+glm(Q002_1_slice ~ T_gender + Q013 + T_Q001_2cat,
+    family = binomial(link = 'logit'), 
+    data = binary_responses) %>% 
+    summary
+
+binary_responses <- 
+    all_data %>% 
+    dplyr::select(contains("slice"), Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
+    mutate(across(contains("slice"),
+                  ~ case_when(. < 4 ~ 0,
+                              . >= 4 ~ 1))) %>% 
+    filter(complete.cases(.))
+
+logistic_test_results <- 
+    all_data %>% 
+    dplyr::select(contains("slice")) %>% 
+    names %>% 
+    map_df( ~ prep_logistic_regression(., data = binary_responses))
+
+
+glm(Q003_2_slice ~ Q013 + T_gender + T_Q001_2cat + Q002_1_slice,
+    family = binomial(link = 'logit'),
+    data = binary_responses) %>% 
+    tidy
+
+
+logistic_test_results %>%
+    filter(p.value < 0.05) %>% 
+    pivot_wider(id_cols = "Dep_variable",
+                names_from = "term",
+                values_from = "p.value") %>% 
+    data.frame
+
+
+###############################
+## Prepare numeric tables... ##
+###############################
+
+long_binary_data <- 
+    all_data %>% 
+    dplyr::select(contains("slice"), Q013, T_gender, TT11edu1, T_Q001_2cat) %>% 
+    mutate(across(contains("slice"),
+                  ~ case_when(. %in% 1:3 ~ 0,
+                              . %in% 4:5 ~ 1,
+                              TRUE ~ -1))) %>%
+    pivot_longer(
+        cols=c("Q013", "TT11edu1"),
+        names_to="Question1",
+        values_to="Answer1") %>% 
+    pivot_longer(
+        cols=c("T_gender", "T_Q001_2cat"),
+        names_to="Question2",
+        values_to="Answer2") %>% 
+    pivot_longer(
+        cols=c("Q002_1_slice", "Q002_2_slice", "Q002_3_slice",
+               "Q002_4_slice", "Q002_5_slice", "Q002_6_slice", 
+               "Q002_7_slice", "Q002_8_slice", "Q002_9_slice",
+               "Q003_1_slice", "Q003_2_slice", "Q003_3_slice",
+               "Q003_4_slice", "Q003_5_slice", "Q003_6_slice", 
+               "Q003_7_slice", "Q003_8_slice", "Q003_9_slice"),
+        names_to="Question3",
+        values_to="Answer3")
+
+
+long_binary_data %>% 
+    filter(Question2 == "T_gender",
+           Answer3 != -1) %>% 
+    unite(Slice_Question, Question3, Answer3, sep = "_") %>% 
+    dplyr::select(Question2, Answer2, Slice_Question) %>% 
+    count(Answer2, Slice_Question) %>% 
+    pivot_wider(id_cols = Slice_Question,
+                names_from = Answer2,
+                values_from = n) %>% 
+    mutate(across(is.numeric, ~ . / 2)) %>% 
+    data.frame
+
+
+long_binary_data %>% 
+    filter(Question2 == "T_Q001_2cat",
+           Answer3 != -1) %>% 
+    unite(Slice_Question, Question3, Answer3, sep = "_") %>% 
+    dplyr::select(Question2, Answer2, Slice_Question) %>% 
+    count(Answer2, Slice_Question) %>% 
+    pivot_wider(id_cols = Slice_Question,
+                names_from = Answer2,
+                values_from = n) %>% 
+    mutate(across(is.numeric, ~ . / 2)) %>% 
+    data.frame
+
+
+long_binary_data %>% 
+    filter(Question1 == "Q013",
+           Answer3 != -1) %>% 
+    unite(Slice_Question, Question3, Answer3, sep = "_") %>% 
+    dplyr::select(Question1, Answer1, Slice_Question) %>% 
+    count(Answer1, Slice_Question) %>% 
+    pivot_wider(id_cols = Slice_Question,
+                names_from = Answer1,
+                values_from = n) %>% 
+    mutate(across(is.numeric, ~ . / 2)) %>% 
+    data.frame
+
+
+long_binary_data %>% 
+    filter(Question1 == "TT11edu1",
+           Answer3 != -1) %>% 
+    unite(Slice_Question, Question3, Answer3, sep = "_") %>% 
+    dplyr::select(Question1, Answer1, Slice_Question) %>% 
+    count(Answer1, Slice_Question) %>% 
+    pivot_wider(id_cols = Slice_Question,
+                names_from = Answer1,
+                values_from = n) %>% 
+    mutate(across(is.numeric, ~ . / 2)) %>% 
+    data.frame
+
+
+#########################
+## Prepare the figures ##
+#########################
+
+long_data <- 
+    all_data %>% 
+    mutate(across(contains("slice") & contains("Q002"),
+                  ~ case_when(. < 4 ~ 0,
+                              . >= 4 ~ 1))) %>% 
+    mutate(across(contains("slice") & contains("Q003"),
+                  ~ case_when(. < 4 ~ 2,
+                              . >= 4 ~ 3))) %>% 
+    pivot_longer(
+        cols=c("Q013", "TT11edu1"),
+        names_to="Question1",
+        values_to="Answer1") %>% 
+    pivot_longer(
+        cols=c("T_gender", "T_Q001_2cat"),
+        names_to="Question2",
+        values_to="Answer2") %>% 
+    pivot_longer(
+        cols=c("Q002_1_slice", "Q002_2_slice", "Q002_3_slice",
+               "Q002_4_slice", "Q002_5_slice", "Q002_6_slice", 
+               "Q002_7_slice", "Q002_8_slice", "Q002_9_slice",
+               "Q003_1_slice", "Q003_2_slice", "Q003_3_slice",
+               "Q003_4_slice", "Q003_5_slice", "Q003_6_slice", 
+               "Q003_7_slice", "Q003_8_slice", "Q003_9_slice"),
+        names_to="Question3",
+        values_to="Answer3") %>% 
+    mutate(
+        Question_type = ifelse(str_detect(Question3, "Q002"), "Pre", "Post"),
+        Answer1=as.factor(Answer1),
+        Answer2=as.factor(Answer2), 
+        Answer3=as.factor(Answer3), 
+        Question1 = case_when(
+            Question1 == "TT11edu1" ~ "Koulutus", 
+            Question1 == "Q013" ~ "Mihin seuraavista ikäryhmistä kuulut?") , 
+        Question2 = case_when(
+            Question2 == "T_Q001_2cat" ~ "Oletko koskaan aiemmin ollut tai oletko parhaillaan osallisena lääketieteellisessä tutkimuksessa?", 
+            Question2 == "T_gender" ~ "Sukupuoli", 
+            ),
+        Question3 = case_when(
+            Question3 == "Q002_1_slice" ~ "Lääkekehitys", 
+            Question3 == "Q002_2_slice" ~ "Lääketurvallisuus", 
+            Question3 == "Q002_3_slice" ~ "Potilaiden rooli ja \nvelvollisuudet lääkkeiden kehityksessä", 
+            Question3 == "Q002_4_slice" ~ "Yksilöllistetty hoito", 
+            Question3 == "Q002_5_slice" ~ "Ennakoiva terveydenhoito", 
+            Question3 == "Q002_6_slice" ~ "Kliinisten lääketutkimusten \nsuunnittelu ja tavoitteet", 
+            Question3 == "Q002_7_slice" ~ "Terveydenhuollon menetelmien arviointi", 
+            Question3 == "Q002_8_slice" ~ "Lääkehoitojen kustannusvaikuttavuus", 
+            Question3 == "Q002_9_slice" ~ "Uusien lääkkeiden kansallinen säätely",
+            Question3 == "Q003_1_slice" ~ "Lääkekehitys", 
+            Question3 == "Q003_2_slice" ~ "Lääketurvallisuus", 
+            Question3 == "Q003_3_slice" ~ "Potilaiden rooli ja \nvelvollisuudet lääkkeiden kehityksessä", 
+            Question3 == "Q003_4_slice" ~ "Yksilöllistetty hoito", 
+            Question3 == "Q003_5_slice" ~ "Ennakoiva terveydenhoito", 
+            Question3 == "Q003_6_slice" ~ "Kliinisten lääketutkimusten \nsuunnittelu ja tavoitteet", 
+            Question3 == "Q003_7_slice" ~ "Terveydenhuollon menetelmien arviointi", 
+            Question3 == "Q003_8_slice" ~ "Lääkehoitojen kustannusvaikuttavuus", 
+            Question3 == "Q003_9_slice" ~ "Uusien lääkkeiden kansallinen säätely"))
+
+
+
+pdf("age_education2.pdf")
+long_data %>% 
+    filter(complete.cases(.)) %>% 
+    ggplot(data=., aes(x=1, fill=Answer3)) +
+    geom_bar(position="dodge") +
+    geom_text(stat='count', aes(label=..count..), vjust=-1) + 
+    facet_grid(Question3 ~ Question1 + Question_type + Answer1, scales="free_x") + 
+    guides(fill=FALSE) + 
+    scale_y_continuous(labels = scales::percent) + 
+    theme(strip.text.y = element_text(angle = 0, size = 4),
+          strip.text.x = element_text(size = 4))
+dev.off()
+
+
+pdf("gender_participation2.pdf")
+long_data %>% 
+    filter(complete.cases(.)) %>% 
+    ggplot(data=., aes(x=1, fill=Answer3)) +
+    geom_bar(position="dodge") +
+    geom_text(stat='count', aes(label=..count..), vjust=-1) + 
+    facet_grid(Question3 ~ Question2 + Question_type + Answer2, scales="free_x") + 
+    guides(fill=FALSE) + 
+    scale_y_continuous(labels = scales::percent) + 
+    theme(strip.text.y = element_text(angle = 0, size = 4),
+          strip.text.x = element_text(size = 4))
+dev.off()
+
+
+pdf("all_data.pdf")
+long_data %>% 
+    filter(complete.cases(.)) %>% 
+    ggplot(data=., aes(x=1, fill=Answer3)) +
+    geom_bar(position="dodge") +
+    facet_grid(Question3 ~ Question_type, scales="free_x") + 
+    guides(fill=FALSE) + 
+    scale_y_continuous(labels = scales::percent) + 
+    theme(strip.text.y = element_text(angle = 0, size = 4),
+          strip.text.x = element_text(size = 4))
+dev.off()
+
+
+
+#+END_SRC
