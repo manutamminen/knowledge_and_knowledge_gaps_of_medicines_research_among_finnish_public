@@ -68,13 +68,13 @@
 | Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
 | Q003_9_slice | Regulation                            |
 
-*** Interest responeses
+*** Interest responses
 
 | 1 | No interest       |
 | 2 | Marginal interest |
 | 3 | Some interest     |
-| 4 | Interest          |
-| 5 | Much interest     |
+| 4 | Interested        |
+| 5 | Highly interested |
 
 
 ** Analyses
