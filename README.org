@@ -37,15 +37,15 @@
 
 *** Current knowledge
 
-| Q003_1_slice | Medicines development, drug discovery |
-| Q003_2_slice | Medicines safety                      |
-| Q003_3_slice | Patients role and responsibilities    |
-| Q003_4_slice | Personalized medicine                 |
-| Q003_5_slice | Predictive medicine                   |
-| Q003_6_slice | Clinical trials                       |
-| Q003_7_slice | HTA                                   |
-| Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
-| Q003_9_slice | Regulation                            |
+| Q002_1_slice | Medicines development, drug discovery |
+| Q002_2_slice | Medicines safety                      |
+| Q002_3_slice | Patients role and responsibilities    |
+| Q002_4_slice | Personalized medicine                 |
+| Q002_5_slice | Predictive medicine                   |
+| Q002_6_slice | Clinical trials                       |
+| Q002_7_slice | HTA                                   |
+| Q002_8_slice | Pharmacoeconomics, cost-effectiveness |
+| Q002_9_slice | Regulation                            |
 
 *** Knowledge responeses
 
@@ -175,6 +175,10 @@ logistic_test_results %>%
                 names_from = "term",
                 values_from = "p.value") %>% 
     data.frame
+
+logistic_test_results %>%
+  filter(p.value < 0.05) %>%
+  write_csv("sig_responses.csv")
 
 ############################
 ## Prepare numeric tables ##
