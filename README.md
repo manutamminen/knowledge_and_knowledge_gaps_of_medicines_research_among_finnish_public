@@ -17,6 +17,8 @@
 
 ### Age responses
 
+| Variable name | Level | Explanation |
+| --- | --- | --- |
 | Q013 | 1 | 16-24 years |
 | Q013 | 2 | 25-34 years |
 | Q013 | 3 | 35-44 years |
@@ -25,6 +27,8 @@
 
 ### Education responses
 
+| Variable name | Level | Explanation |
+| --- | --- | --- |
 | TT11edu1 | 1 | Vocational education and training                |
 | TT11edu1 | 2 | High school degree                               |
 | TT11edu1 | 3 | Post-secondary education                         |
@@ -33,16 +37,22 @@
 
 ### Gender responses
 
+| Variable name | Level | Explanation |
+| --- | --- | --- |
 | T_gender | 1 | Female |
 | T_gender | 2 | Male   |
 
 ### Medical research responses
 
+| Variable name | Level | Explanation |
+| --- | --- | --- |
 | T_Q001_2cat | 1 | Yes |
 | T_Q001_2cat | 2 | No  |
 
 ### Current knowledge
 
+| Variable name| Explanation |
+| --- | --- |
 | Q002_1_slice | Medicines development, drug discovery |
 | Q002_2_slice | Medicines safety                      |
 | Q002_3_slice | Patients role and responsibilities    |
@@ -55,6 +65,8 @@
 
 ### Knowledge responeses
 
+| Variable level| Explanation |
+| --- | --- |
 | 1 | No knowledge        |
 | 2 | Poor knowledge      |
 | 3 | Average knowledge   |
@@ -63,6 +75,8 @@
 
 ### Interest in learning more
 
+| Variable name| Explanation |
+| --- | --- |
 | Q003_1_slice | Medicines development, drug discovery |
 | Q003_2_slice | Medicines safety                      |
 | Q003_3_slice | Patients role and responsibilities    |
@@ -75,6 +89,8 @@
 
 ### Interest responses
 
+| Variable level| Explanation |
+| --- | --- |
 | 1 | No interest       |
 | 2 | Marginal interest |
 | 3 | Some interest     |
