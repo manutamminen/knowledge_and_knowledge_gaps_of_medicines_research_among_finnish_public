@@ -1,17 +1,19 @@
-[[https://zenodo.org/badge/255566850.svg][https://zenodo.org/badge/latestdoi/255566850]]
+<!-- badges: start -->
+[![DOI](https://zenodo.org/badge/255566850.svg)](https://zenodo.org/badge/latestdoi/255566850)
+<!-- badges: end -->
 
-* Self-perceived knowledge and knowledge gaps of medicines research and development and HTA-processes among Finnish general public 
+# Self-perceived knowledge and knowledge gaps of medicines research and development and HTA-processes among Finnish general public 
 
-** Data - Knowledge about medicines research and development 
+## Data - Knowledge about medicines research and development 
 
-*** Background variables
+### Background variables
 
 | Q013        | Age group                                                       |
 | TT11edu1    | Education                                                       |
 | T_gender    | Gender                                                          |
 | T_Q001_2cat | Are you taking part or have you taken part in medical research? |
 
-*** Age responses
+### Age responses
 
 | Q013 | 1 | 16-24 years |
 | Q013 | 2 | 25-34 years |
@@ -19,7 +21,7 @@
 | Q013 | 4 | 45-54 years |
 | Q013 | 5 | 55-64 years |
 
-*** Education responses
+### Education responses
 
 | TT11edu1 | 1 | Vocational education and training                |
 | TT11edu1 | 2 | High school degree                               |
@@ -27,17 +29,17 @@
 | TT11edu1 | 4 | Bachelor's degree, University of Applied Science |
 | TT11edu1 | 5 | University degree                                |
 
-*** Gender responses
+### Gender responses
 
 | T_gender | 1 | Female |
 | T_gender | 2 | Male   |
 
-*** Medical research responses
+### Medical research responses
 
 | T_Q001_2cat | 1 | Yes |
 | T_Q001_2cat | 2 | No  |
 
-*** Current knowledge
+### Current knowledge
 
 | Q002_1_slice | Medicines development, drug discovery |
 | Q002_2_slice | Medicines safety                      |
@@ -49,7 +51,7 @@
 | Q002_8_slice | Pharmacoeconomics, cost-effectiveness |
 | Q002_9_slice | Regulation                            |
 
-*** Knowledge responeses
+### Knowledge responeses
 
 | 1 | No knowledge        |
 | 2 | Poor knowledge      |
@@ -57,7 +59,7 @@
 | 4 | Good knowledge      |
 | 5 | Very good knowledge |
 
-*** Interest in learning more
+### Interest in learning more
 
 | Q003_1_slice | Medicines development, drug discovery |
 | Q003_2_slice | Medicines safety                      |
@@ -69,7 +71,7 @@
 | Q003_8_slice | Pharmacoeconomics, cost-effectiveness |
 | Q003_9_slice | Regulation                            |
 
-*** Interest responses
+### Interest responses
 
 | 1 | No interest       |
 | 2 | Marginal interest |
@@ -78,10 +80,10 @@
 | 5 | Highly interested |
 
 
-** Analyses
+## Analyses
 
 
-#+BEGIN_SRC R :session
+```R
 
 library(tidyverse)
 library(ggh4x)
@@ -331,10 +333,9 @@ long_data %>%
     theme(strip.text.y = element_text(angle = 0, size = 4),
           strip.text.x = element_text(size = 4))
 dev.off()
+```
 
-#+END_SRC
-
-** Session info 
+## Session info 
 
 R version 3.6.0 (2019-04-26)
 Platform: x86_64-apple-darwin13.4.0 (64-bit)
