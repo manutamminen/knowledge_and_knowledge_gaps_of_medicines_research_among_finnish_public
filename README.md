@@ -8,6 +8,8 @@
 
 ### Background variables
 
+| Variable name| Explanation |
+| --- | --- |
 | Q013        | Age group                                                       |
 | TT11edu1    | Education                                                       |
 | T_gender    | Gender                                                          |
