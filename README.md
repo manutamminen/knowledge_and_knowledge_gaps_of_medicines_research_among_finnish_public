@@ -2,7 +2,7 @@
 [![DOI](https://zenodo.org/badge/255566850.svg)](https://zenodo.org/badge/latestdoi/255566850)
 <!-- badges: end -->
 
-# Self-perceived knowledge and knowledge gaps of medicines research and development and HTA-processes among Finnish general public 
+# A quantitative online survey of self-perceived knowledge and knowledge gaps of medicines research and development among Finnish general public
 
 ## Data - Knowledge about medicines research and development 
 
