@@ -6,6 +6,8 @@
 
 ## Data - Knowledge about medicines research and development 
 
+Questionnaire raw data available at [https://raw.githubusercontent.com/manutamminen/knowledge_and_knowledge_gaps_of_medicines_research_among_finnish_public/master/questionnaire.csv](https://raw.githubusercontent.com/manutamminen/knowledge_and_knowledge_gaps_of_medicines_research_among_finnish_public/master/questionnaire.csv)
+
 ### Background variables
 
 | Variable name| Explanation |
@@ -32,8 +34,8 @@
 | TT11edu1 | 1 | Vocational education and training                |
 | TT11edu1 | 2 | High school degree                               |
 | TT11edu1 | 3 | Post-secondary education                         |
-| TT11edu1 | 4 | Bachelor's degree, University of Applied Science |
-| TT11edu1 | 5 | University degree                                |
+| TT11edu1 | 4 | Bachelor's degree or equivalent                  |
+| TT11edu1 | 5 | Master's degree or higher                        |
 
 ### Gender responses
 
